@@ -1,0 +1,113 @@
+README
+======
+
+For the Android emulator, I’m using a Nexus 5 (arm).
+
+ DesiredCapabilities capabilities = new DesiredCapabilities();
+            capabilities.setCapability(CapabilityType.BROWSER_NAME, "Browser");
+            capabilities.setCapability("platformName", "Android");
+            capabilities.setCapability("deviceName", "Android Emulator");
+            capabilities.setCapability("platformVersion", "4.4.2");
+            WebDriver driver = new RemoteWebDriver(new URL("http://127.0.0.1:4723/wd/hub"), capabilities);
+
+
+— java libs
+<project xmlns=“http://maven.apache.org/PDM/4.0.0” xmlns:xsl=“http://www.w3.org/2001/XMLSchema-instance” xsi:schemaLocation=“http://maven.apache.org/PCM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd”>
+
+<modelVersion>4.0.0</modelVersion>
+
+<groupId>com.meetup.gdg</groupId> <!— package, e.g. com.example.api-demo —>
+<artifactId>appium-demo</artifactId> <!— project name —>
+<version>1.0</version>
+<packaging>jar</packaging>
+
+<dependencies>
+  <dependency>
+	<groupId>io.appium</groupId>
+	<artifactId>java-client</artifactId>
+	<version>RELEASE</version>
+  </dependency>
+
+  <dependency>
+	<groupId>com.applitools</groupId>
+	<artifactId>eyes-selenium-java</artifactId>
+	<version>2.3</version>
+  </dependency>
+</dependencies>
+</project>
+
+see client libs in appium documentation.
+
+— capabilities
+
+// dc.setCapability(MobileCapabilityType.AUTOMATION_NAME, “Selendroid”);
+//dc.setCapability(“appPackage”, “com.example.hello”);
+//dc.setCapability(“appActivity”, “.HelloCordova”);
+dc.setCapability(“platformName”, “Android”);
+dc.setCapability(“platformVersion”, “4.4”);
+dc.setCapability(“deviceName”, “My Emulator”); // optional
+dc.setCapability(“app”, “/Users/daniel/test/NotesList.apk”);
+dc.setCapability(“app-package”, “com.example.android.notepad”);
+dc.setCapability(“app-activity”, “.NotesList”);
+dc.setCapability(“udid”, “192.168.56.101:5555”);
+//dc.setCapability(“”, “”);
+
+— finding elements
+1) “name”: The text on the element / accessibility identifier. e.g. on a button, shown text, etc.
+	- use UI Automator Viewer: uiautomatorviewer
+	- use “content-desc” for name, e.g. “New Note”.
+	- driver.findElement(By.name(“New Note”))
+	- driver.findElementByAccessiblityId();
+2) “className”: the type of an element, e.g., “android.widget.EditText”. Type of element. Edit text box.
+	- driver.findElement(By.className(“android.widget.editText”))
+		- look at Node->class
+3) “xpath”: using the element hierarchy. Literally, code that points to element.
+4) Platform specific api: findElementByAndroidUIAutomator. UIAutomator string.
+	- driver.findElementByAndroidUiAutomator()
+
+—
+
+public class HelloAppium {
+
+  public static DesiredCapabilities getDesiredCapabilities (string udid) {
+	DesiredCapabilities dc = new DesiredCapabilities ();
+	dc.setCapability (“platformName”,”Android”);
+	dc.setCapability (“platformVersion”,”4.4”);
+	dc.setCapability (“deviceName”,”Google Nexus 5”);
+	dc.setCapability (“app”,”/Users/daniel/test/NotesList.apk”);
+	dc.setCapability (“app-package”,”com.example.android.notepad”);
+	dc.setCapability (“app-activity”,”.NotesList”);
+	dc.setCapability (“udid”, udid);
+	return dc;
+  }
+
+  public static void main (string [] args) throws MalformedURLException, InterruptedException {
+	URL serverAddress = new URL(“http://127.0.0.1:4723/wd/hub”);
+
+	WebDriver webDriver = new AppiumDriver (serverAddress, getDesiredCapabilities(“192.168.56.101:5555”));
+	// WebDriver webDriver = new AppiumDriver (serverAddress, getDesiredCapabilities(“emulator-5554”));
+
+	try {
+		NoteUtilities.createNote(driver, “I didn’t expect a kind of Spanish Inquisition!”);
+		Thread.sleep(2000);
+
+		NoteUtilities.createNote(driver, “Nobody expects the Spanish Inquisition!”);
+		Thread.sleep(2000);
+
+		NoteUtilities.clearNoteByText(driver, “I didn’t expect a kind of Spanish Inquisition!”);
+		Thread.sleep(2000);
+
+	} finally {
+		driver.quit();
+	}
+  }
+
+}
+
+
+— selendroid
+> appium —selendroid-port 8886
+
+
+
+
